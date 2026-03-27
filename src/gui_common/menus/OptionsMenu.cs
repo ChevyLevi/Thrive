@@ -478,7 +478,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private double displayedCacheSize = -1;
 
-    private int programmaticControlUpdateDepth;
+    private bool isProgrammaticControlUpdateInProgress;
 
     // Signals
 
@@ -502,7 +502,6 @@ public partial class OptionsMenu : ControlWithInput
 
     private static List<string> Languages => LanguagesCache.Value;
     private static List<string> AudioOutputDevices => AudioOutputDevicesCache;
-    private bool IsProgrammaticControlUpdateInProgress => programmaticControlUpdateDepth > 0;
 
     public override void _Ready()
     {
@@ -682,7 +681,8 @@ public partial class OptionsMenu : ControlWithInput
 
     private void PerformProgrammaticControlUpdate(Action updateAction)
     {
-        ++programmaticControlUpdateDepth;
+        var state = isProgrammaticControlUpdateInProgress;
+        isProgrammaticControlUpdateInProgress = true;
 
         try
         {
@@ -690,7 +690,7 @@ public partial class OptionsMenu : ControlWithInput
         }
         finally
         {
-            --programmaticControlUpdateDepth;
+            isProgrammaticControlUpdateInProgress = state;
         }
     }
 
@@ -1574,7 +1574,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void UpdateResetSaveButtonState()
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         // Enable the save and reset buttons if the current setting values differ from the saved ones.
@@ -1876,7 +1876,7 @@ public partial class OptionsMenu : ControlWithInput
     // Graphics Button Callbacks
     private void OnDisplayModeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DisplayMode.Value = DisplayIndexToEnum(index);
@@ -1887,7 +1887,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnVSyncToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VSync.Value = pressed;
@@ -1929,7 +1929,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnGraphicsPresetSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         var preset = GraphicsPresets.Preset.Custom;
@@ -1978,7 +1978,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAntiAliasingModeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.AntiAliasing.Value = AntiAliasingIndexToValue(index);
@@ -2017,7 +2017,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMSAAResolutionSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MSAAResolution.Value = MSAAIndexToResolution(index);
@@ -2029,7 +2029,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAnisotropicFilteringSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.AnisotropicFilterLevel.Value = AnisotropicFilteringIndexToLevel(index);
@@ -2041,7 +2041,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMaxFramesPerSecondSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MaxFramesPerSecond.Value = MaxFPSIndexToValue(index);
@@ -2052,7 +2052,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnRenderScaleChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.RenderScale.Value = value;
@@ -2072,7 +2072,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMonitorSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         if (index < 0 || index >= displaysCache.Count)
@@ -2093,7 +2093,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnUpscalingMethodSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.UpscalingMethod.Value = UpscalingMethodIndexToValue(index);
@@ -2107,7 +2107,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnUpscalingSharpeningChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.UpscalingSharpening.Value = value;
@@ -2118,7 +2118,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnColourblindSettingSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ColourblindSetting.Value = index;
@@ -2129,7 +2129,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnChromaticAberrationToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ChromaticEnabled.Value = toggle;
@@ -2141,7 +2141,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnChromaticAberrationValueChanged(float amount)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ChromaticAmount.Value = amount;
@@ -2169,7 +2169,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDisplayAbilitiesHotBarToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DisplayAbilitiesHotBar.Value = toggle;
@@ -2179,7 +2179,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDamageEffectToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ScreenDamageEffect.Value = pressed;
@@ -2189,7 +2189,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnStrainVisibilityModeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.StrainBarVisibilityMode.Value = (Settings.StrainBarVisibility)index;
@@ -2230,7 +2230,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnControllerTypeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ControllerPromptType.Value = ControllerIndexToPromptType(index);
@@ -2240,7 +2240,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDisplayBackgroundParticlesToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DisplayBackgroundParticles.Value = toggle;
@@ -2251,7 +2251,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMicrobeBackgroundDistortionToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         if (toggle)
@@ -2269,7 +2269,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnLowQualityBackgroundBlurToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MicrobeBackgroundBlurLowQuality.Value = toggle;
@@ -2280,7 +2280,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnCurrentParticlesOptionSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MicrobeCurrentParticles.Value = CurrentParticlesIndexToMode(index);
@@ -2291,7 +2291,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMicrobeRippleToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MicrobeRippleEffect.Value = toggle;
@@ -2302,7 +2302,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMicrobeCameraTiltToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MicrobeCameraTilt.Value = toggle;
@@ -2312,7 +2312,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnGUILightEffectsToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.GUILightEffectsEnabled.Value = toggle;
@@ -2323,7 +2323,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDisplayPartNamesToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DisplayPartNames.Value = toggle;
@@ -2333,7 +2333,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDisplay3DMenuBackgroundsToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.Menu3DBackgroundEnabled.Value = toggle;
@@ -2344,7 +2344,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnBloomToggled(bool toggle)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.BloomEnabled.Value = toggle;
@@ -2356,7 +2356,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnBloomStrengthChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.BloomStrength.Value = value;
@@ -2366,7 +2366,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnBlurStrengthChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MicrobeBackgroundBlurStrength.Value = value;
@@ -2378,7 +2378,7 @@ public partial class OptionsMenu : ControlWithInput
     // Sound Button Callbacks
     private void OnMasterVolumeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeMaster.Value = ConvertSoundBarToDb(value);
@@ -2389,7 +2389,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMasterMutedToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeMasterMuted.Value = pressed;
@@ -2400,7 +2400,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMusicVolumeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeMusic.Value = ConvertSoundBarToDb(value);
@@ -2411,7 +2411,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMusicMutedToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeMusicMuted.Value = pressed;
@@ -2422,7 +2422,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAmbianceVolumeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeAmbiance.Value = ConvertSoundBarToDb(value);
@@ -2433,7 +2433,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAmbianceMutedToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeAmbianceMuted.Value = pressed;
@@ -2444,7 +2444,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnSFXVolumeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeSFX.Value = ConvertSoundBarToDb(value);
@@ -2455,7 +2455,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnSFXMutedToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeSFXMuted.Value = pressed;
@@ -2466,7 +2466,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnGUIVolumeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeGUI.Value = ConvertSoundBarToDb(value);
@@ -2477,7 +2477,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnGUIMutedToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VolumeGUIMuted.Value = pressed;
@@ -2489,7 +2489,7 @@ public partial class OptionsMenu : ControlWithInput
     // Performance Button Callbacks
     private void OnCloudIntervalSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.CloudUpdateInterval.Value = CloudIndexToInterval(index);
@@ -2499,7 +2499,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnCloudResolutionSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.CloudResolution.Value = CloudIndexToResolution(index);
@@ -2509,7 +2509,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAutoEvoToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.RunAutoEvoDuringGamePlay.Value = pressed;
@@ -2520,7 +2520,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnRunSimulationMultithreadedToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.RunGameSimulationMultithreaded.Value = pressed;
@@ -2530,7 +2530,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnHyperthreadingToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.AssumeCPUHasHyperthreading.Value = pressed;
@@ -2542,7 +2542,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnManualThreadsToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.UseManualThreadCount.Value = pressed;
@@ -2562,7 +2562,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnManualThreadCountChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         // Ignore setting these things when we are using automatic thread count to prevent unnecessarily settings
@@ -2580,7 +2580,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnManualNativeThreadsToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.UseManualNativeThreadCount.Value = pressed;
@@ -2600,7 +2600,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnManualNativeThreadCountChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         if (!Settings.Instance.UseManualNativeThreadCount.Value)
@@ -2625,7 +2625,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDiskCachingToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.UseDiskCache.Value = pressed;
@@ -2647,7 +2647,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMaxCacheSizeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DiskCacheSize.Value = (long)(Math.Round(value / 1024.0f) * 1024);
@@ -2664,7 +2664,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDiskCacheDurationChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DiskCacheMaxTime.Value = (float)Math.Round(value);
@@ -2680,7 +2680,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMemoryMaxItemsChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MemoryCacheMaxSize.Value = (int)value;
@@ -2696,7 +2696,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMemoryDiskCacheTimeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.DiskMemoryCachePortionTime.Value = (float)Math.Round(value);
@@ -2712,7 +2712,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMemoryOnlyCacheTimeChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MemoryOnlyCacheTime.Value = (float)Math.Round(value);
@@ -2728,7 +2728,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMaxSpawnedEntitiesSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MaxSpawnedEntities.Value = MaxEntitiesIndexToValue(index);
@@ -2739,7 +2739,7 @@ public partial class OptionsMenu : ControlWithInput
     // Input Callbacks
     private void OnMouseAxesBoundToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         mouseVerticalSensitivity.Editable = !pressed;
@@ -2753,7 +2753,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMouseHorizontalSensitivityChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.HorizontalMouseLookSensitivity.Value = MouseInputBarValueToSensitivity(value);
@@ -2768,7 +2768,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnInvertedMouseHorizontalToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.InvertHorizontalMouseLook.Value = pressed;
@@ -2778,7 +2778,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMouseVerticalSensitivityChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VerticalMouseLookSensitivity.Value = MouseInputBarValueToSensitivity(value);
@@ -2788,7 +2788,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnInvertedMouseVerticalToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.InvertVerticalMouseLook.Value = pressed;
@@ -2798,7 +2798,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMouseSensitivityScaleModeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ScaleMouseInputByWindowSize.Value = MouseInputScalingIndexToEnum(index);
@@ -2808,7 +2808,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMouseScaleLogicalWindowSizeToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.InputWindowSizeIsLogicalSize.Value = pressed;
@@ -2818,7 +2818,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnControllerAxesBoundToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         controllerVerticalSensitivity.Editable = !pressed;
@@ -2831,7 +2831,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnControllerHorizontalSensitivityChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.HorizontalControllerLookSensitivity.Value = ControllerInputBarValueToSensitivity(value);
@@ -2846,7 +2846,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnInvertedControllerHorizontalToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.InvertHorizontalControllerLook.Value = pressed;
@@ -2856,7 +2856,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnControllerVerticalSensitivityChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.VerticalControllerLookSensitivity.Value = ControllerInputBarValueToSensitivity(value);
@@ -2866,7 +2866,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnInvertedControllerVerticalToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.InvertVerticalControllerLook.Value = pressed;
@@ -2901,7 +2901,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMovement2DTypeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.TwoDimensionalMovement.Value = Movement2DIndexToType(index);
@@ -2935,7 +2935,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMovement3DTypeSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ThreeDimensionalMovement.Value = Movement3DIndexToMovementType(index);
@@ -2945,7 +2945,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMouseEdgePanToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.PanStrategyViewWithMouse.Value = pressed;
@@ -2957,7 +2957,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMouseEdgePanSensitivityChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.PanStrategyViewMouseSpeed.Value = value;
@@ -2974,7 +2974,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnDeadzoneConfigurationChanged(List<float> deadzones)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ControllerAxisDeadzoneAxes.Value = deadzones;
@@ -2984,7 +2984,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnControlsChanged(InputDataList data)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.CurrentControls.Value = data;
@@ -2995,7 +2995,7 @@ public partial class OptionsMenu : ControlWithInput
     // Misc Button Callbacks
     private void OnIntroToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.PlayIntroVideo.Value = pressed;
@@ -3005,7 +3005,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMicrobeIntroToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.PlayMicrobeIntroVideo.Value = pressed;
@@ -3015,7 +3015,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnTutorialsOnNewGameToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.TutorialsEnabled.Value = pressed;
@@ -3025,7 +3025,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnCheatsToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.CheatsEnabled.Value = pressed;
@@ -3039,7 +3039,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAutoSaveToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.AutoSaveEnabled.Value = pressed;
@@ -3050,7 +3050,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMaxAutoSavesValueChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MaxAutoSaves.Value = (int)value;
@@ -3060,7 +3060,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnMaxQuickSavesValueChanged(float value)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.MaxQuickSaves.Value = (int)value;
@@ -3070,7 +3070,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnTutorialsEnabledToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         if (gameProperties == null)
@@ -3086,7 +3086,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnScreenEffectSelected(int index)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         var effect = SimulationParameters.Instance.GetScreenEffectByIndex(index);
@@ -3101,7 +3101,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnUnsavedProgressWarningToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ShowUnsavedProgressWarning.Value = pressed;
@@ -3129,7 +3129,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnCustomUsernameEnabledToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.CustomUsernameEnabled.Value = pressed;
@@ -3140,7 +3140,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnCustomUsernameTextChanged(string text)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         if (text.Equals(Settings.EnvironmentUserName, StringComparison.CurrentCulture))
@@ -3157,7 +3157,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnWebFeedsEnabledToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ThriveNewsFeedEnabled.Value = pressed;
@@ -3167,7 +3167,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnPatchNotesEnabledToggled(bool pressed)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.ShowNewPatchNotes.Value = pressed;
@@ -3177,7 +3177,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnAudioOutputDeviceSettingSelected(int item)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.SelectedAudioOutputDevice.Value = AudioOutputDevices[item];
@@ -3188,7 +3188,7 @@ public partial class OptionsMenu : ControlWithInput
 
     private void OnLanguageSettingSelected(int item)
     {
-        if (IsProgrammaticControlUpdateInProgress)
+        if (isProgrammaticControlUpdateInProgress)
             return;
 
         Settings.Instance.SelectedLanguage.Value = Languages[item];
