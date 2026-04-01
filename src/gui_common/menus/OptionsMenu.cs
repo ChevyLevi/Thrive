@@ -611,11 +611,10 @@ public partial class OptionsMenu : ControlWithInput
         SwitchMode(OptionsMode.InGame);
 
         // Set the state of the gui controls to match the settings.
-        PerformProgrammaticControlUpdate(() =>
-        {
-            tutorialsEnabled.ButtonPressed = savedTutorialsEnabled;
-            ApplySettingsToControlsInternal(savedSettings);
-        });
+        isProgrammaticControlUpdateInProgress = true;
+        tutorialsEnabled.ButtonPressed = savedTutorialsEnabled;
+        ApplySettingsToControlsInternal(savedSettings);
+        isProgrammaticControlUpdateInProgress = false;
 
         UpdateResetSaveButtonState();
 
@@ -630,12 +629,16 @@ public partial class OptionsMenu : ControlWithInput
     /// </summary>
     public void ApplySettingsToControls(Settings settings)
     {
-        PerformProgrammaticControlUpdate(() => ApplySettingsToControlsInternal(settings));
+        isProgrammaticControlUpdateInProgress = true;
+        ApplySettingsToControlsInternal(settings);
+        isProgrammaticControlUpdateInProgress = false;
     }
 
     public void ApplyGraphicsPresetOptionsToControls(Settings settings)
     {
-        PerformProgrammaticControlUpdate(() => ApplyGraphicsPresetOptionsToControlsInternal(settings));
+        isProgrammaticControlUpdateInProgress = true;
+        ApplyGraphicsPresetOptionsToControlsInternal(settings);
+        isProgrammaticControlUpdateInProgress = false;
     }
 
     [RunOnKeyDown("ui_cancel", Priority = Constants.SUBMENU_CANCEL_PRIORITY)]
@@ -677,21 +680,6 @@ public partial class OptionsMenu : ControlWithInput
         LoadLanguages();
         LoadAudioOutputDevices();
         LoadScreenEffects();
-    }
-
-    private void PerformProgrammaticControlUpdate(Action updateAction)
-    {
-        var state = isProgrammaticControlUpdateInProgress;
-        isProgrammaticControlUpdateInProgress = true;
-
-        try
-        {
-            updateAction();
-        }
-        finally
-        {
-            isProgrammaticControlUpdateInProgress = state;
-        }
     }
 
     private void ApplySettingsToControlsInternal(Settings settings)
@@ -1764,16 +1752,16 @@ public partial class OptionsMenu : ControlWithInput
         // Restore and apply the old saved settings.
         Settings.Instance.LoadFromObject(savedSettings);
         Settings.Instance.ApplyAll();
-        PerformProgrammaticControlUpdate(() =>
-        {
-            ApplySettingsToControlsInternal(Settings.Instance);
+        isProgrammaticControlUpdateInProgress = true;
+        ApplySettingsToControlsInternal(Settings.Instance);
 
-            if (optionsMode == OptionsMode.InGame)
-            {
-                gameProperties!.TutorialState.Enabled = savedTutorialsEnabled;
-                tutorialsEnabled.ButtonPressed = savedTutorialsEnabled;
-            }
-        });
+        if (optionsMode == OptionsMode.InGame)
+        {
+            gameProperties!.TutorialState.Enabled = savedTutorialsEnabled;
+            tutorialsEnabled.ButtonPressed = savedTutorialsEnabled;
+        }
+
+        isProgrammaticControlUpdateInProgress = false;
 
         UpdateResetSaveButtonState();
     }
@@ -1830,16 +1818,16 @@ public partial class OptionsMenu : ControlWithInput
     {
         Settings.Instance.LoadFromObject(savedSettings);
         Settings.Instance.ApplyAll();
-        PerformProgrammaticControlUpdate(() =>
-        {
-            ApplySettingsToControlsInternal(Settings.Instance);
+        isProgrammaticControlUpdateInProgress = true;
+        ApplySettingsToControlsInternal(Settings.Instance);
 
-            if (optionsMode == OptionsMode.InGame)
-            {
-                gameProperties!.TutorialState.Enabled = savedTutorialsEnabled;
-                tutorialsEnabled.ButtonPressed = savedTutorialsEnabled;
-            }
-        });
+        if (optionsMode == OptionsMode.InGame)
+        {
+            gameProperties!.TutorialState.Enabled = savedTutorialsEnabled;
+            tutorialsEnabled.ButtonPressed = savedTutorialsEnabled;
+        }
+
+        isProgrammaticControlUpdateInProgress = false;
 
         backConfirmationBox.Hide();
 
@@ -1901,7 +1889,11 @@ public partial class OptionsMenu : ControlWithInput
         var wanted = CalculateGraphicsPreset(Settings.Instance);
 
         if (graphicsPreset.Selected != wanted)
-            PerformProgrammaticControlUpdate(() => graphicsPreset.Selected = wanted);
+        {
+            isProgrammaticControlUpdateInProgress = true;
+            graphicsPreset.Selected = wanted;
+            isProgrammaticControlUpdateInProgress = false;
+        }
     }
 
     private int CalculateGraphicsPreset(Settings settings)
@@ -2556,7 +2548,9 @@ public partial class OptionsMenu : ControlWithInput
         // Apply the current value to the slider to make sure it is showing the actual setting value
         if (pressed)
         {
-            PerformProgrammaticControlUpdate(() => threadCountSlider.Value = Settings.Instance.ThreadCount.Value);
+            isProgrammaticControlUpdateInProgress = true;
+            threadCountSlider.Value = Settings.Instance.ThreadCount.Value;
+            isProgrammaticControlUpdateInProgress = false;
         }
     }
 
@@ -2593,8 +2587,9 @@ public partial class OptionsMenu : ControlWithInput
 
         if (pressed)
         {
-            PerformProgrammaticControlUpdate(
-                () => nativeThreadCountSlider.Value = Settings.Instance.NativeThreadCount.Value);
+            isProgrammaticControlUpdateInProgress = true;
+            nativeThreadCountSlider.Value = Settings.Instance.NativeThreadCount.Value;
+            isProgrammaticControlUpdateInProgress = false;
         }
     }
 
