@@ -1890,9 +1890,7 @@ public partial class OptionsMenu : ControlWithInput
 
         if (graphicsPreset.Selected != wanted)
         {
-            isProgrammaticControlUpdateInProgress = true;
             graphicsPreset.Selected = wanted;
-            isProgrammaticControlUpdateInProgress = false;
         }
     }
 
@@ -2548,9 +2546,7 @@ public partial class OptionsMenu : ControlWithInput
         // Apply the current value to the slider to make sure it is showing the actual setting value
         if (pressed)
         {
-            isProgrammaticControlUpdateInProgress = true;
             threadCountSlider.Value = Settings.Instance.ThreadCount.Value;
-            isProgrammaticControlUpdateInProgress = false;
         }
     }
 
@@ -2587,9 +2583,7 @@ public partial class OptionsMenu : ControlWithInput
 
         if (pressed)
         {
-            isProgrammaticControlUpdateInProgress = true;
             nativeThreadCountSlider.Value = Settings.Instance.NativeThreadCount.Value;
-            isProgrammaticControlUpdateInProgress = false;
         }
     }
 
